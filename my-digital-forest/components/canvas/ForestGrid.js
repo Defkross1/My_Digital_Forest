@@ -3,29 +3,31 @@
 import { useFrame } from "@react-three/fiber";
 import { useRef, useMemo } from "react";
 
-export default function ForestGrid() {
+export default function ForestGrid({ analyser }) {
   const group = useRef();
-  
-  // Definimos la cuadrícula una vez
+
   const columns = useMemo(() => {
     const grid = [];
     for (let x = -5; x < 5; x++) {
       for (let z = -5; z < 5; z++) {
-        grid.push({ x, z, baseHeight: Math.random() * 3 + 1 });
+        grid.push({ x, z });
       }
     }
     return grid;
   }, []);
 
-  // useFrame nos permite animar en cada fotograma
-  useFrame((state) => {
-    const time = state.clock.getElapsedTime();
-    group.current.children.forEach((mesh, i) => {
-      // Aquí más adelante conectaremos el audio
-      // Por ahora, una animación suave para probar reactividad
-      const scale = Math.sin(time + i) * 0.5 + 1;
-      mesh.scale.y = scale;
-    });
+  useFrame(() => {
+    if (analyser && group.current) {
+      // Obtenemos los datos de frecuencia del audio
+      const data = analyser.getFrequencyData();
+      
+      group.current.children.forEach((mesh, i) => {
+        // Usamos el dato de frecuencia para escalar la altura (valor entre 0 y 255)
+        // Mapeamos el dato para que sea una escala suave (ej: 0.1 a 5)
+        const intensity = data[i % data.length] / 255;
+        mesh.scale.y = 0.5 + intensity * 5;
+      });
+    }
   });
 
   return (
