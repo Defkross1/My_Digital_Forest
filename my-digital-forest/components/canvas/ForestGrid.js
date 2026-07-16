@@ -17,17 +17,30 @@ export default function ForestGrid({ analyser }) {
     return grid;
   }, []);
 
-  useFrame(() => {
-    if (analyser && group.current) {
-      const data = analyser.getFrequencyData();
-      const newIntensities = columns.map((_, i) => data[i % data.length] / 255);
-      setIntensities(newIntensities);
+useFrame((state, delta) => {
+  if (analyser && group.current) {
+    const data = analyser.getFrequencyData();
+    const sensibilidad = 2.0; // Aumenta este valor para más altura, disminuye para menos
+    const suavizado = 5.0;    // Velocidad de respuesta (menor = más suave)
 
-      group.current.children.forEach((mesh, i) => {
-        mesh.scale.y = 0.5 + newIntensities[i] * 5;
-      });
-    }
-  });
+    group.current.children.forEach((mesh, i) => {
+      // Obtenemos el dato y aplicamos sensibilidad
+      const rawIntensity = data[i % data.length] / 255;
+      const targetScale = 0.5 + (rawIntensity * sensibilidad * 4);
+      
+      // Aplicamos interpolación lineal (lerp) para suavizar el movimiento
+      // Esto hace que la columna "suba y baje" con inercia, muy brutalista
+      mesh.scale.y += (targetScale - mesh.scale.y) * (delta * suavizado);
+      
+      // Actualizamos el estado para el color basado en la altura real
+      // Así el color siempre coincide con la altura de la columna
+      intensities[i] = mesh.scale.y / 5;
+    });
+    
+    // Forzamos un re-render del estado para el color
+    setIntensities([...intensities]);
+  }
+});
 
   return (
     <group ref={group}>
