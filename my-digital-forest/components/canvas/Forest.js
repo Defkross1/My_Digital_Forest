@@ -1,21 +1,26 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import ForestGrid from "./ForestGrid"; // Importamos nuestro sistema
+import { useState } from "react";
+import ForestGrid from "./ForestGrid";
+import AudioPlayer from "./AudioPlayer";
 
 export default function Forest() {
+  const [analyser, setAnalyser] = useState(null);
+
   return (
-    <div style={{ width: "100vw", height: "100vh", background: "#f0f0f0" }}>
+    <>
+      <button 
+        style={{ position: 'absolute', top: 20, left: 20, zIndex: 10 }}
+        onClick={() => window.startAudio()}
+      >
+        INICIAR BOSQUE SONORO
+      </button>
+
       <Canvas camera={{ position: [10, 10, 10], fov: 50 }}>
-        <ambientLight intensity={0.3} />
-        <directionalLight position={[10, 10, 5]} intensity={1} castShadow />
-        
-        {/* Aquí está nuestro bosque */}
-        <ForestGrid />
-        
-        <OrbitControls />
+        <AudioPlayer url="/audio.mp3" setAnalyser={setAnalyser} />
+        <ForestGrid analyser={analyser} />
       </Canvas>
-    </div>
+    </>
   );
 }
