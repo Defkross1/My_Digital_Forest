@@ -10,30 +10,35 @@ export default function AudioPlayer({ url, setAnalyser }) {
   const sound = useRef(null);
 
   useEffect(() => {
-    // Añadimos el listener a la cámara
     camera.add(listener.current);
     
-    // Creamos el nodo de sonido
+    // Inicializamos el sonido
     sound.current = new THREE.Audio(listener.current);
     
     const audioLoader = new THREE.AudioLoader();
     audioLoader.load(url, (buffer) => {
       sound.current.setBuffer(buffer);
       sound.current.setLoop(true);
-      // Creamos el analizador
-      const analyser = new THREE.AudioAnalyser(sound.current, 32);
-      setAnalyser(analyser); // Pasamos el analizador hacia arriba
+      // Creamos el analizador con una FFT size más grande para mayor detalle (64 o 128)
+      const analyser = new THREE.AudioAnalyser(sound.current, 64);
+      setAnalyser(analyser);
     });
 
     return () => {
       camera.remove(listener.current);
+      if (sound.current) sound.current.disconnect();
     };
   }, [url, camera, setAnalyser]);
 
-  // Función para arrancar el audio desde el componente padre
-  window.startAudio = () => {
+  // Esta es la parte crítica para el audio en navegadores modernos
+  window.startAudio = async () => {
+    const context = listener.current.context;
+    if (context.state === 'suspended') {
+      await context.resume();
+    }
     if (sound.current && !sound.current.isPlaying) {
       sound.current.play();
+      console.log("Audio iniciado correctamente");
     }
   };
 

@@ -1,3 +1,4 @@
+/** @jsxImportSource @react-three/fiber */
 "use client";
 
 import { useFrame } from "@react-three/fiber";
@@ -30,14 +31,15 @@ export default function ForestGrid({ analyser }) {
     }
   });
 
-  return (
-    <group ref={group}>
-      {columns.map((col, i) => (
-        <mesh key={i} position={[col.x * 2, 0, col.z * 2]}>
-          <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial color="#333333" />
-        </mesh>
-      ))}
-    </group>
-  );
+// En ForestGrid.js, cambia la posición y escala en el retorno:
+return (
+  <group ref={group} scale={[2, 2, 2]}> {/* Escalamos el grupo completo */}
+    {columns.map((col, i) => (
+      <mesh key={i} position={[col.x * 2, 0, col.z * 2]}>
+        <boxGeometry args={[0.8, 1, 0.8]} /> {/* Columnas más anchas */}
+        <meshStandardMaterial color="#444444" />
+      </mesh>
+    ))}
+  </group>
+);
 }
