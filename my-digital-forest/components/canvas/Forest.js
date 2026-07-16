@@ -17,7 +17,7 @@ export default function Forest() {
         INICIAR BOSQUE SONORO
       </button>
 
-      <Canvas camera={{ position: [10, 10, 10], fov: 50 }}>
+      <Canvas camera={{ position: [0, 5, 10], fov: 45 }}>
         <AudioPlayer url="/audio.mp3" setAnalyser={setAnalyser} />
         <ForestGrid analyser={analyser} />
       </Canvas>
