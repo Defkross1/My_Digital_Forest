@@ -1,56 +1,40 @@
 "use client";
 
 import { useFrame } from "@react-three/fiber";
-import { useRef, useMemo, useState } from "react";
+import { useRef, useMemo } from "react";
 
 export default function ForestGrid({ analyser }) {
   const group = useRef();
-  const [intensities, setIntensities] = useState(new Array(100).fill(0));
-
+  
+  // Estructura fija: El bosque es una retícula de hormigón
   const columns = useMemo(() => {
     const grid = [];
-    for (let x = -5; x < 5; x++) {
-      for (let z = -5; z < 5; z++) {
-        grid.push({ x, z });
+    for (let x = -10; x <= 10; x += 3) {
+      for (let z = -10; z <= 10; z += 3) {
+        grid.push({ x, z, baseHeight: Math.random() * 5 + 2 });
       }
     }
     return grid;
   }, []);
 
-useFrame((state, delta) => {
-  if (analyser && group.current) {
-    const data = analyser.getFrequencyData();
-    const sensibilidad = 2.0; // Aumenta este valor para más altura, disminuye para menos
-    const suavizado = 5.0;    // Velocidad de respuesta (menor = más suave)
-
-    group.current.children.forEach((mesh, i) => {
-      // Obtenemos el dato y aplicamos sensibilidad
-      const rawIntensity = data[i % data.length] / 255;
-      const targetScale = 0.5 + (rawIntensity * sensibilidad * 4);
-      
-      // Aplicamos interpolación lineal (lerp) para suavizar el movimiento
-      // Esto hace que la columna "suba y baje" con inercia, muy brutalista
-      mesh.scale.y += (targetScale - mesh.scale.y) * (delta * suavizado);
-      
-      // Actualizamos el estado para el color basado en la altura real
-      // Así el color siempre coincide con la altura de la columna
-      intensities[i] = mesh.scale.y / 5;
-    });
-    
-    // Forzamos un re-render del estado para el color
-    setIntensities([...intensities]);
-  }
-});
+  useFrame(() => {
+    if (analyser && group.current) {
+      const data = analyser.getFrequencyData();
+      group.current.children.forEach((mesh, i) => {
+        const intensity = data[i % data.length] / 255;
+        // La altura se mueve con lentitud, como hormigón desplazándose
+        const target = intensity * 15;
+        mesh.scale.y += (target - mesh.scale.y) * 0.02; 
+      });
+    }
+  });
 
   return (
-    <group ref={group}>
+    <group ref={group} position={[0, -5, 0]}>
       {columns.map((col, i) => (
-        <mesh key={i} position={[col.x * 2, 0, col.z * 2]} castShadow receiveShadow>
-          <boxGeometry args={[0.8, 1, 0.8]} />
-          <meshStandardMaterial 
-            color={`rgb(${50 + intensities[i] * 150}, 50, 50)`} 
-            roughness={0.8} 
-          />
+        <mesh key={i} position={[col.x, col.baseHeight, col.z]} castShadow receiveShadow>
+          <boxGeometry args={[2, 10, 2]} />
+          <meshStandardMaterial color="#333333" roughness={1} metalness={0} />
         </mesh>
       ))}
     </group>

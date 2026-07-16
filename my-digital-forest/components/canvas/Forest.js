@@ -19,17 +19,15 @@ export default function Forest() {
         INICIAR BOSQUE SONORO
       </button>
 
-      <Canvas shadows camera={{ position: [10, 10, 10], fov: 45 }}>
-        <ambientLight intensity={0.2} />
-        <directionalLight 
-          position={[10, 10, 5]} 
-          intensity={1.5} 
-          castShadow 
-          shadow-mapSize={[1024, 1024]} 
-      />
-  <AudioPlayer url="/audio.mp3" setAnalyser={setAnalyser} />
+<Canvas shadows camera={{ position: [25, 15, 25], fov: 30 }}>
+  <color attach="background" args={["#111111"]} />
+  <fog attach="fog" args={["#111111", 5, 60]} />
+  
+  <ambientLight intensity={0.05} />
+  <directionalLight position={[0, 20, 0]} intensity={2} castShadow />
+  
   <ForestGrid analyser={analyser} />
-  <OrbitControls enablePan={true} enableZoom={true} />
+  <OrbitControls maxPolarAngle={Math.PI / 2 - 0.1} />
 </Canvas>
     </>
   );
