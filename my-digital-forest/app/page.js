@@ -1,4 +1,4 @@
-import Forest from "@/components/canvas/Forest";
+import Forest from "../components/canvas/Forest";
 
 export default function Home() {
   return (
