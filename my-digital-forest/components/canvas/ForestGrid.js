@@ -1,4 +1,3 @@
-/** @jsxImportSource @react-three/fiber */
 "use client";
 
 import { useFrame } from "@react-three/fiber";
