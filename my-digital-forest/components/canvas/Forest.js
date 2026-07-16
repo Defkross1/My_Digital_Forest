@@ -1,11 +1,13 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei"; // <--- ESTO ES LO QUE FALTA
 import { useState } from "react";
 import ForestGrid from "./ForestGrid";
 import AudioPlayer from "./AudioPlayer";
 
 export default function Forest() {
+
   const [analyser, setAnalyser] = useState(null);
 
   return (
