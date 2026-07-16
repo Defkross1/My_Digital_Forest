@@ -18,17 +18,19 @@ export default function ForestGrid({ analyser }) {
 
   useFrame(() => {
     if (analyser && group.current) {
-      // Obtenemos los datos de frecuencia del audio
       const data = analyser.getFrequencyData();
-      
-      group.current.children.forEach((mesh, i) => {
-        // Usamos el dato de frecuencia para escalar la altura (valor entre 0 y 255)
-        // Mapeamos el dato para que sea una escala suave (ej: 0.1 a 5)
+    
+     group.current.children.forEach((mesh, i) => {
+        // Ajustamos el índice para obtener una muestra de datos más clara
         const intensity = data[i % data.length] / 255;
-        mesh.scale.y = 0.5 + intensity * 5;
+      
+        // Aplicamos un suavizado (lerp) o una escala más dramática
+        // La base es 0.5, y la intensidad amplifica hasta 8 veces la altura
+        const targetHeight = 0.5 + intensity * 8;
+        mesh.scale.y = targetHeight;
       });
     }
-  });
+});
 
 // En ForestGrid.js, cambia la posición y escala en el retorno:
 return (
