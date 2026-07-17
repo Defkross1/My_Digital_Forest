@@ -1,34 +1,25 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei"; // <--- ESTO ES LO QUE FALTA
+import { OrbitControls } from "@react-three/drei";
 import { useState } from "react";
-import ForestGrid from "./ForestGrid";
-import AudioPlayer from "./AudioPlayer";
+// Comentamos la importación por un momento para aislar el error
+// import ForestGrid from "./ForestGrid"; 
 
 export default function Forest() {
-
-  const [analyser, setAnalyser] = useState(null);
-
   return (
-    <>
-      <button 
-        style={{ position: 'absolute', top: 20, left: 20, zIndex: 10 }}
-        onClick={() => window.startAudio()}
-      >
-        INICIAR BOSQUE SONORO
-      </button>
-
-<Canvas shadows camera={{ position: [25, 15, 25], fov: 30 }}>
-  <color attach="background" args={["#111111"]} />
-  <fog attach="fog" args={["#111111", 5, 60]} />
-  
-  <ambientLight intensity={0.05} />
-  <directionalLight position={[0, 20, 0]} intensity={2} castShadow />
-  
-  <ForestGrid analyser={analyser} />
-  <OrbitControls maxPolarAngle={Math.PI / 2 - 0.1} />
-</Canvas>
-    </>
+    <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+      <Canvas camera={{ position: [25, 15, 25], fov: 30 }}>
+          <ambientLight intensity={0.5} />
+         <directionalLight position={[10, 10, 5]} intensity={1} castShadow />
+       <mesh castShadow receiveShadow>
+         {/* Ajustamos la geometría: ancho 2, altura 10, profundidad 2 */}
+            <boxGeometry args={[2, 10, 2]} /> 
+           {/* Material estilo concreto brutalista */}
+          <meshStandardMaterial color="#4a4a4a" roughness={0.8} />
+       </mesh>
+        <OrbitControls />
+      </Canvas>
+    </div>
   );
 }
